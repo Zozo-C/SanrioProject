@@ -583,7 +583,7 @@
             width: 120px;
             height: 120px;
             margin: 10px auto;
-            background: var(--card-border);
+            background: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -593,7 +593,7 @@
         
         /* 樣式 1: 圓點風 */
         .share-card.style-0 {
-            background-color: #fff;
+            background: linear-gradient(135deg, #ffffff 0%, var(--bg) 50%, #ffffff 100%);
             background-image: radial-gradient(var(--card-border) 2px, transparent 2px);
             background-size: 20px 20px;
             border: 4px dashed var(--accent);
@@ -601,32 +601,33 @@
         
         /* 樣式 2: 漸層風 */
         .share-card.style-1 {
-            background: linear-gradient(135deg, var(--bg) 0%, #fff 100%);
+            background: linear-gradient(135deg, var(--bg) 0%, #fff 50%, var(--card-border) 100%);
             border: 4px double var(--accent);
         }
         
         /* 樣式 3: 簡約色塊 */
         .share-card.style-2 {
-            background: var(--bg);
+            background: linear-gradient(180deg, #ffffff 0%, var(--bg) 100%);
             border: 8px solid #fff;
             outline: 2px solid var(--card-border);
         }
         
         /* 樣式 4: 斜紋風 */
         .share-card.style-3 {
-            background: repeating-linear-gradient(
-              45deg,
-              #fff,
-              #fff 10px,
-              var(--bg) 10px,
-              var(--bg) 20px
-            );
+            background: linear-gradient(135deg, var(--card-border) 0%, #fff 50%, var(--bg) 100%),
+                        repeating-linear-gradient(
+                          45deg,
+                          transparent,
+                          transparent 10px,
+                          rgba(255,255,255,0.3) 10px,
+                          rgba(255,255,255,0.3) 20px
+                        );
             border: 4px solid var(--text-main);
         }
 
         /* 樣式 5: 邊框風 */
         .share-card.style-4 {
-            background: #fff;
+            background: radial-gradient(circle at top left, var(--bg) 0%, #fff 100%);
             border: 2px solid var(--card-border);
             box-shadow: inset 0 0 0 6px var(--bg);
         }
@@ -865,7 +866,7 @@
                 <p style="font-size:11px; color:#999; margin-top:8px; line-height:1.4;">
                     💡 手機版：點「📥 儲存圖片」後長按可存到相簿<br>
                     「📤 分享」可直接分享圖片到 IG/LINE 等社群<br>
-                    （圖片格式已優化為 JPEG，檔案更小更好分享）
+                    <span style="color: #ff6b81; font-weight: bold;">📸 無法儲存？直接截圖也可以喔！</span>
                 </p>
                 
                 <button id="closeShare" class="modal-btn" style="width:100%; margin-top:10px; background:#ccc; color:#666;">關閉</button>
@@ -1356,13 +1357,19 @@
             const shapeClass = getShapeClass();
 
             shareCard.innerHTML = `
-                <h3 style="margin-bottom:5px; color:var(--accent); font-size:1.3rem; text-shadow:1px 1px 0 #fff;">${DATA.nickname} 的應援卡</h3>
+                <!-- 裝飾色塊 -->
+                <div style="position: absolute; top: -10px; right: -10px; width: 100px; height: 100px; background: linear-gradient(135deg, var(--accent), var(--btn-bg)); opacity: 0.1; border-radius: 50%; z-index: 0;"></div>
+                <div style="position: absolute; bottom: -20px; left: -20px; width: 120px; height: 120px; background: linear-gradient(45deg, var(--card-border), transparent); opacity: 0.15; border-radius: 50%; z-index: 0;"></div>
                 
-                <div class="share-badge-large ${shapeClass}">
-                    ${todayBadge}
+                <div style="position: relative; z-index: 1;">
+                    <h3 style="margin-bottom:5px; color:var(--accent); font-size:1.3rem; text-shadow:1px 1px 0 #fff;">${DATA.nickname} 的應援卡</h3>
+                    
+                    <div class="share-badge-large ${shapeClass}" style="opacity: 1;">
+                        ${todayBadge}
+                    </div>
                 </div>
 
-                <div class="stats-grid">
+                <div class="stats-grid" style="position: relative; z-index: 1;">
                     <div class="stat-box">
                         <div class="stat-num">${badgeCount}</div>
                         <div class="stat-label">獲得徽章</div>
@@ -1402,16 +1409,64 @@
             const element = document.getElementById("shareCard");
             const originalStyle = element.style.cssText;
             
+            // 找到徽章元素並暫停動畫，固定在 100% 不透明狀態
+            const badge = element.querySelector('.share-badge-large');
+            const originalBadgeStyle = badge.style.cssText;
+            badge.style.animation = 'none';
+            badge.style.opacity = '1';
+            badge.style.transform = 'scale(1)';
+            
             // 強制固定寬度以獲得最佳截圖效果
             element.style.width = "360px"; 
             element.style.margin = "0 auto";
             element.style.transform = "none";
 
             html2canvas(element, {
-                backgroundColor: "#ffffff", // 白色背景，JPEG 需要
-                scale: 2
+                backgroundColor: null,
+                scale: 4, // 最高解析度，確保徽章超級清晰
+                logging: false,
+                useCORS: true,
+                allowTaint: true,
+                letterRendering: true,
+                imageTimeout: 0,
+                removeContainer: true,
+                foreignObjectRendering: false // 強制使用原生渲染，emoji 更清晰
             }).then(canvas => {
+                // 創建一個新的 canvas 加上白色圓角背景
+                const finalCanvas = document.createElement('canvas');
+                const ctx = finalCanvas.getContext('2d');
+                const padding = 20; // 外圖留白
+                
+                finalCanvas.width = canvas.width + padding * 2;
+                finalCanvas.height = canvas.height + padding * 2;
+                
+                // 填充白色背景
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+                
+                // 繪製圓角矩形
+                const radius = 60; // 圓角半徑
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(padding + radius, padding);
+                ctx.lineTo(finalCanvas.width - padding - radius, padding);
+                ctx.arcTo(finalCanvas.width - padding, padding, finalCanvas.width - padding, padding + radius, radius);
+                ctx.lineTo(finalCanvas.width - padding, finalCanvas.height - padding - radius);
+                ctx.arcTo(finalCanvas.width - padding, finalCanvas.height - padding, finalCanvas.width - padding - radius, finalCanvas.height - padding, radius);
+                ctx.lineTo(padding + radius, finalCanvas.height - padding);
+                ctx.arcTo(padding, finalCanvas.height - padding, padding, finalCanvas.height - padding - radius, radius);
+                ctx.lineTo(padding, padding + radius);
+                ctx.arcTo(padding, padding, padding + radius, padding, radius);
+                ctx.closePath();
+                ctx.clip();
+                
+                // 繪製原始內容
+                ctx.drawImage(canvas, padding, padding);
+                ctx.restore();
+                
+                canvas = finalCanvas; // 替換為新的 canvas
                 element.style.cssText = originalStyle;
+                badge.style.cssText = originalBadgeStyle; // 恢復徽章動畫
                 
                 // 偵測是否為手機裝置
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -1441,8 +1496,11 @@
                     
                     overlay.innerHTML = `
                         <div style="background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 15px; max-width: 90%;">
-                            <p style="margin: 0 0 10px 0; color: #ff66a3; font-weight: bold; font-size: 16px;">📱 長按下方圖片</p>
-                            <p style="margin: 0; color: #666; font-size: 14px;">選擇「儲存圖片」或「加入相片」<br>即可儲存到相簿！</p>
+                            <p style="margin: 0 0 10px 0; color: #ff66a3; font-weight: bold; font-size: 16px;">📱 儲存方式</p>
+                            <p style="margin: 0 0 8px 0; color: #666; font-size: 14px;">
+                                <strong>方法1：</strong> 長按圖片 → 選擇「儲存圖片」<br>
+                                <strong>方法2：</strong> 直接截圖也可以喔！📸
+                            </p>
                         </div>
                         <img src="${imageData}" style="max-width: 90%; max-height: 60vh; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);" alt="小葵應援卡">
                         <button style="margin-top: 20px; padding: 12px 30px; background: #ff66a3; color: white; border: none; border-radius: 25px; font-size: 16px; font-weight: bold;">關閉</button>
@@ -1474,20 +1532,68 @@
             });
         };
 
-        // 分享圖片到社群媒體（改用 JPEG 格式）
+        // 分享圖片到社群媒體
         $("shareNativeBtn").onclick = async () => {
             const element = document.getElementById("shareCard");
             const originalStyle = element.style.cssText;
+            
+            // 找到徽章元素並暫停動畫，固定在 100% 不透明狀態
+            const badge = element.querySelector('.share-badge-large');
+            const originalBadgeStyle = badge.style.cssText;
+            badge.style.animation = 'none';
+            badge.style.opacity = '1';
+            badge.style.transform = 'scale(1)';
             
             element.style.width = "360px"; 
             element.style.margin = "0 auto";
             element.style.transform = "none";
 
             html2canvas(element, {
-                backgroundColor: "#ffffff", // 白色背景
-                scale: 2
+                backgroundColor: null,
+                scale: 4, // 最高解析度
+                logging: false,
+                useCORS: true,
+                allowTaint: true,
+                letterRendering: true,
+                imageTimeout: 0,
+                removeContainer: true,
+                foreignObjectRendering: false
             }).then(async (canvas) => {
+                // 創建一個新的 canvas 加上白色圓角背景
+                const finalCanvas = document.createElement('canvas');
+                const ctx = finalCanvas.getContext('2d');
+                const padding = 20;
+                
+                finalCanvas.width = canvas.width + padding * 2;
+                finalCanvas.height = canvas.height + padding * 2;
+                
+                // 填充白色背景
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+                
+                // 繪製圓角矩形
+                const radius = 60;
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(padding + radius, padding);
+                ctx.lineTo(finalCanvas.width - padding - radius, padding);
+                ctx.arcTo(finalCanvas.width - padding, padding, finalCanvas.width - padding, padding + radius, radius);
+                ctx.lineTo(finalCanvas.width - padding, finalCanvas.height - padding - radius);
+                ctx.arcTo(finalCanvas.width - padding, finalCanvas.height - padding, finalCanvas.width - padding - radius, finalCanvas.height - padding, radius);
+                ctx.lineTo(padding + radius, finalCanvas.height - padding);
+                ctx.arcTo(padding, finalCanvas.height - padding, padding, finalCanvas.height - padding - radius, radius);
+                ctx.lineTo(padding, padding + radius);
+                ctx.arcTo(padding, padding, padding + radius, padding, radius);
+                ctx.closePath();
+                ctx.clip();
+                
+                // 繪製原始內容
+                ctx.drawImage(canvas, padding, padding);
+                ctx.restore();
+                
+                canvas = finalCanvas;
                 element.style.cssText = originalStyle;
+                badge.style.cssText = originalBadgeStyle; // 恢復徽章動畫
                 
                 // 將 canvas 轉換為 JPEG blob（檔案更小，相容性更好）
                 canvas.toBlob(async (blob) => {
