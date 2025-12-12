@@ -863,8 +863,9 @@
                 </div>
                 
                 <p style="font-size:11px; color:#999; margin-top:8px; line-height:1.4;">
-                    💡 手機版：「儲存圖片」後長按可存到相簿<br>
-                    「分享」可直接分享圖片到 IG/LINE 等社群
+                    💡 手機版：點「📥 儲存圖片」後長按可存到相簿<br>
+                    「📤 分享」可直接分享圖片到 IG/LINE 等社群<br>
+                    （圖片格式已優化為 JPEG，檔案更小更好分享）
                 </p>
                 
                 <button id="closeShare" class="modal-btn" style="width:100%; margin-top:10px; background:#ccc; color:#666;">關閉</button>
@@ -1396,7 +1397,7 @@
             updateShareCardPreview();
         });
 
-        // 下載圖片 (手機版會引導長按儲存)
+        // 下載圖片 (改用 JPEG 格式，相容性更好)
         $("downloadCardBtn").onclick = () => {
             const element = document.getElementById("shareCard");
             const originalStyle = element.style.cssText;
@@ -1407,7 +1408,7 @@
             element.style.transform = "none";
 
             html2canvas(element, {
-                backgroundColor: null, // 保留 CSS 中的背景設定
+                backgroundColor: "#ffffff", // 白色背景，JPEG 需要
                 scale: 2
             }).then(canvas => {
                 element.style.cssText = originalStyle;
@@ -1415,60 +1416,65 @@
                 // 偵測是否為手機裝置
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                 
+                // 轉換為 JPEG（檔案更小，相容性更好）
+                const imageData = canvas.toDataURL('image/jpeg', 0.95);
+                
                 if (isMobile) {
-                    // 手機版：顯示圖片並引導長按儲存
-                    const imgWindow = window.open('');
-                    imgWindow.document.write(`
-                        <html>
-                        <head>
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                            <style>
-                                body { 
-                                    margin: 0; 
-                                    padding: 20px; 
-                                    background: #f5f5f5; 
-                                    font-family: system-ui, -apple-system, sans-serif;
-                                    text-align: center;
-                                }
-                                .tip { 
-                                    background: #fff; 
-                                    padding: 15px; 
-                                    border-radius: 10px; 
-                                    margin-bottom: 15px;
-                                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                                }
-                                img { 
-                                    max-width: 100%; 
-                                    border-radius: 15px; 
-                                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                                }
-                                .instruction {
-                                    color: #ff66a3;
-                                    font-weight: bold;
-                                    font-size: 16px;
-                                }
-                            </style>
-                        </head>
-                        <body>
-                            <div class="tip">
-                                <p class="instruction">📱 長按下方圖片</p>
-                                <p style="color: #666; font-size: 14px;">選擇「儲存圖片」或「加入相片」<br>即可儲存到相簿！</p>
-                            </div>
-                            <img src="${canvas.toDataURL('image/png')}" alt="小葵應援卡">
-                        </body>
-                        </html>
-                    `);
+                    // 手機版：在當前頁面顯示圖片（不開新視窗，避免被阻擋）
+                    // 創建臨時容器
+                    const overlay = document.createElement('div');
+                    overlay.style.cssText = `
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0,0,0,0.9);
+                        z-index: 9999;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        padding: 20px;
+                        box-sizing: border-box;
+                    `;
+                    
+                    overlay.innerHTML = `
+                        <div style="background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 15px; max-width: 90%;">
+                            <p style="margin: 0 0 10px 0; color: #ff66a3; font-weight: bold; font-size: 16px;">📱 長按下方圖片</p>
+                            <p style="margin: 0; color: #666; font-size: 14px;">選擇「儲存圖片」或「加入相片」<br>即可儲存到相簿！</p>
+                        </div>
+                        <img src="${imageData}" style="max-width: 90%; max-height: 60vh; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);" alt="小葵應援卡">
+                        <button style="margin-top: 20px; padding: 12px 30px; background: #ff66a3; color: white; border: none; border-radius: 25px; font-size: 16px; font-weight: bold;">關閉</button>
+                    `;
+                    
+                    // 點擊關閉按鈕移除覆蓋層
+                    overlay.querySelector('button').onclick = () => {
+                        document.body.removeChild(overlay);
+                    };
+                    
+                    // 點擊背景也可關閉
+                    overlay.onclick = (e) => {
+                        if (e.target === overlay) {
+                            document.body.removeChild(overlay);
+                        }
+                    };
+                    
+                    document.body.appendChild(overlay);
                 } else {
                     // 電腦版：直接下載
                     const link = document.createElement('a');
-                    link.download = `小葵應援卡_Day${DATA.badges.length}.png`;
-                    link.href = canvas.toDataURL("image/png");
+                    link.download = `小葵應援卡_Day${DATA.badges.length}.jpg`;
+                    link.href = imageData;
                     link.click();
                 }
+            }).catch(err => {
+                console.error('截圖失敗', err);
+                alert('⚠️ 圖片生成失敗，請稍後再試');
             });
         };
 
-        // 分享圖片到社群媒體
+        // 分享圖片到社群媒體（改用 JPEG 格式）
         $("shareNativeBtn").onclick = async () => {
             const element = document.getElementById("shareCard");
             const originalStyle = element.style.cssText;
@@ -1478,14 +1484,14 @@
             element.style.transform = "none";
 
             html2canvas(element, {
-                backgroundColor: null,
+                backgroundColor: "#ffffff", // 白色背景
                 scale: 2
             }).then(async (canvas) => {
                 element.style.cssText = originalStyle;
                 
-                // 將 canvas 轉換為 blob
+                // 將 canvas 轉換為 JPEG blob（檔案更小，相容性更好）
                 canvas.toBlob(async (blob) => {
-                    const file = new File([blob], `小葵應援卡_Day${DATA.badges.length}.png`, { type: 'image/png' });
+                    const file = new File([blob], `小葵應援卡_Day${DATA.badges.length}.jpg`, { type: 'image/jpeg' });
                     
                     const shareData = {
                         title: '小葵的三麗鷗夢想舞台',
@@ -1507,7 +1513,10 @@
                         // 不支援分享圖片，降級為複製連結
                         fallbackShare();
                     }
-                }, 'image/png');
+                }, 'image/jpeg', 0.95); // 使用 95% 品質的 JPEG
+            }).catch(err => {
+                console.error('截圖失敗', err);
+                alert('⚠️ 圖片生成失敗，請稍後再試');
             });
         };
         
