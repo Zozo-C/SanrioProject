@@ -704,7 +704,7 @@
             
             <!-- 新增常駐提示 -->
             <p style="font-size: 0.85rem; color: #ff6b81; text-align: center; margin-top: 10px; font-weight: bold; line-height: 1.4;">
-                🎁 小驚喜：若抽中「向日葵 🌻」<br>
+                🎁 小驚喜：若抽中「向日葵 🌻」或「海鷗 🕊️」<br>
                 記得分享貼文並截圖回傳給我 / tag我，可兌換 45元飲料一杯！
             </p>
 
@@ -1151,14 +1151,23 @@
             // --- 抽獎邏輯開始 ---
             let randomIcon;
             let isSuperRare = false;
+            let superRareType = "";
 
-            // 設定超級大獎機率 (例如 0.02 = 2%)
-            const SUPER_RARE_CHANCE = 0.02; 
+            // 設定超級大獎機率 (各 2%)
+            const SUNFLOWER_CHANCE = 0.02;  // 向日葵 2%
+            const SEAGULL_CHANCE = 0.02;     // 海鷗 2%
+            const randomNum = Math.random();
 
-            if (Math.random() < SUPER_RARE_CHANCE) {
-                // 中大獎！
-                randomIcon = "🌻"; // 向日葵
+            if (randomNum < SUNFLOWER_CHANCE) {
+                // 中向日葵大獎！
+                randomIcon = "🌻";
                 isSuperRare = true;
+                superRareType = "sunflower";
+            } else if (randomNum < (SUNFLOWER_CHANCE + SEAGULL_CHANCE)) {
+                // 中海鷗大獎！
+                randomIcon = "🕊️";
+                isSuperRare = true;
+                superRareType = "seagull";
             } else {
                 // 普通獎
                 randomIcon = BADGE_POOL[Math.floor(Math.random() * BADGE_POOL.length)];
@@ -1188,8 +1197,14 @@
             // 根據是否中大獎顯示不同訊息
             const msgEl = $("voteMsg");
             if (isSuperRare) {
-                // 更新為指定的中獎提示語
-                msgEl.innerHTML = `🎉 <strong>恭喜抽中隱藏版向日葵！🌻</strong><br>記得分享貼文並截圖回傳給我 / tag我，可兌換 45元飲料一杯！🥤`;
+                // 根據中獎類型顯示不同訊息
+                let prizeMessage = "";
+                if (superRareType === "sunflower") {
+                    prizeMessage = `🎉 <strong>恭喜抽中隱藏版向日葵！🌻</strong><br>記得分享貼文並截圖回傳給我 / tag我，可兌換 45元飲料一杯！🥤`;
+                } else if (superRareType === "seagull") {
+                    prizeMessage = `🎉 <strong>恭喜抽中隱藏版海鷗！🕊️</strong><br>記得分享貼文並截圖回傳給我 / tag我，可兌換 45元飲料一杯！🥤`;
+                }
+                msgEl.innerHTML = prizeMessage;
                 msgEl.style.color = "#ff4757"; // 特別的紅色
                 msgEl.style.fontSize = "1rem";
                 msgEl.style.lineHeight = "1.5";
