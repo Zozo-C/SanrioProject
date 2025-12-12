@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小葵的三麗鷗夢想舞台</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet" />
+    
+    <!-- 截圖功能庫 (必須有網路才能運作) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        /* ========================================= */
+        /* 🌸 基礎設定 & 變數 */
+        /* ========================================= */
+
+        :root {
+            --bg: #fffafc;
+            --card-bg: #ffffff;
+            --card-border: #ffe6f3;
+            --text-main: #ff66a3;
+            --text-dark: #5d4037;
+            --accent: #ff85b3;
+            --btn-bg: #ff7fb8;
+            --btn-bg-dark: #ff559f;
+            --soft-shadow: 0 8px 20px rgba(255, 150, 200, 0.25);
+            --font-main: 'Zen Maru Gothic', sans-serif;
+            --deadline-color: #ff5252;
+            
+            /* 分享卡片變數 */
+            --share-bg: #ffffff;
+            --share-pattern: none;
+            --share-border: 4px solid var(--card-border);
+        }
+
+        /* ============================= */
+        /* 🎀 主題色切換 (色彩無障礙優化版) */
+        /* ============================= */
+
+        [data-theme="melody"] {
+            --bg: #fff6fb;
+            --card-border: #ffd8ec;
+            --accent: #d65a88;
+            --btn-bg: #ff8ac6;
+            --text-dark: #6b3030;
+            --soft-shadow: 0 8px 20px rgba(255, 138, 198, 0.25);
+        }
+
+        [data-theme="cinnamoroll"] {
+            --bg: #f0f8ff;
+            --card-border: #cce9ff;
+            --accent: #0077be;
+            --btn-bg: #4a90e2;
+            --text-dark: #1a3c5e;
+            --soft-shadow: 0 8px 20px rgba(74, 144, 226, 0.2);
+        }
+
+        [data-theme="kuromi"] {
+            --bg: #fcfaff;
+            --card-border: #e0d4fc;
+            --accent: #8a63cc;
+            --btn-bg: #9b7bdb;
+            --text-dark: #3a2a4d;
+            --soft-shadow: 0 8px 20px rgba(155, 123, 219, 0.25);
+        }
+
+        [data-theme="pompompurin"] {
+            --bg: #fffdf5;
+            --card-border: #fceea4;
+            --accent: #d48806;
+            --btn-bg: #f5c242;
+            --text-dark: #4e342e;
+            --soft-shadow: 0 8px 20px rgba(245, 194, 66, 0.25);
+        }
+
+        [data-theme="kitty"] {
+            --bg: #fffafa;
+            --card-border: #ffd1dc;
+            --accent: #e0245e;
+            --btn-bg: #ff6b8b;
+            --text-dark: #5d2e2e;
+            --soft-shadow: 0 8px 20px rgba(255, 107, 139, 0.25);
+        }
+
+        /* ========================================= */
+        /* 🌸 Layout */
+        /* ========================================= */
+
+        * {
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, border-radius 0.3s ease;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            font-family: var(--font-main);
+            color: var(--text-dark);
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 10px 10px;
+        }
+
+        .main-title {
+            font-size: 24px;
+            color: var(--accent);
+            font-weight: 700;
+            margin: 0 0 8px 0;
+            text-shadow: 2px 2px 0px #fff;
+        }
+
+        .deadline-tag {
+            display: inline-block;
+            background: var(--card-bg);
+            border: 2px solid var(--deadline-color);
+            color: var(--deadline-color);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .greeting {
+            font-size: 16px;
+            color: var(--text-dark);
+            opacity: 0.9;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .main-container {
+            max-width: 500px;
+            margin: auto;
+            padding: 10px 20px;
+        }
+
+        /* ========================================= */
+        /* ☁️ 棉花糖泡泡風卡片 */
+        /* ========================================= */
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 32px;
+            padding: 24px;
+            margin-bottom: 22px;
+            border: 3px solid var(--card-border);
+            box-shadow: var(--soft-shadow);
+            position: relative;
+        }
+
+        .section-title {
+            font-size: 18px;
+            color: var(--accent);
+            margin-bottom: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px dashed var(--card-border);
+            padding-bottom: 10px;
+        }
+
+        /* ========================================= */
+        /* 🌸 Buttons & Inputs */
+        /* ========================================= */
+
+        button, .vote-link {
+            font-family: var(--font-main);
+            outline: none;
+        }
+
+        .vote-button,
+        .modal-btn,
+        .small-btn,
+        .share-button,
+        .settings-btn,
+        .vote-link {
+            background: var(--btn-bg);
+            border: none;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: inline-block;
+            text-decoration: none;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .vote-button:active,
+        .modal-btn:active,
+        .small-btn:active,
+        .share-button:active,
+        .settings-btn:active,
+        .vote-link:active {
+            transform: scale(0.96);
+        }
+
+        .vote-link {
+            display: block;
+            width: 100%;
+            margin-bottom: 15px;
+            background: var(--accent);
+        }
+
+        .vote-button {
+            width: 100%;
+            background: #fff;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+        }
+
+        .vote-button.disabled {
+            background: #f0f0f0;
+            border-color: #ddd;
+            color: #aaa;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .small-btn {
+            padding: 8px 16px;
+            font-size: 14px;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            box-shadow: none;
+        }
+
+        .settings-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            background: #fff;
+            color: var(--text-dark);
+            border: 2px solid var(--card-border);
+        }
+
+        .delete-btn {
+            background: #ff8ea3;
+            color: white;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 20px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        .selector, .input, .textarea {
+            width: 100%;
+            border-radius: 18px;
+            padding: 12px 14px;
+            border: 2px solid var(--card-border);
+            font-size: 16px;
+            font-family: inherit;
+            box-sizing: border-box;
+            background: var(--bg);
+            color: var(--text-dark);
+            outline: none;
+            margin: 5px 0;
+        }
+
+        .textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        /* ========================================= */
+        /* 💬 小語 & 內容 */
+        /* ========================================= */
+
+        .daily-quote {
+            font-size: 15px;
+            color: var(--text-dark);
+            padding: 15px;
+            background: var(--bg);
+            border-radius: 20px;
+            text-align: center;
+            font-style: italic;
+            border: 1px solid var(--card-border);
+        }
+
+        .vote-msg {
+            text-align: center;
+            margin-top: 10px;
+            min-height: 24px;
+            font-size: 0.95rem;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* ========================================= */
+        /* 🎀 徽章樣式與動畫 */
+        /* ========================================= */
+
+        .today-badge-container {
+            width: 120px;
+            height: 120px;
+            margin: 20px auto 10px;
+            position: relative;
+        }
+
+        .today-badge {
+            width: 100%;
+            height: 100%;
+            background: var(--card-border);
+            /* border-radius 由 shape 類別控制 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: var(--text-dark);
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .animate-pop {
+            animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+            60% { transform: scale(1.1) rotate(10deg); opacity: 1; }
+            80% { transform: scale(0.95) rotate(-5deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        /* --- 徽章造型 CSS --- */
+        .shape-default { border-radius: 20px; }
+        .shape-circle { border-radius: 50%; }
+        .shape-stamp { border-radius: 4px; border: 3px dashed var(--accent) !important; background-color: #fff; }
+        .shape-glow { border-radius: 20px; box-shadow: 0 0 10px var(--accent), 0 0 20px var(--btn-bg); border: 2px solid #fff; }
+
+        /* ========================================= */
+        /* 🌈 徽章冊 */
+        /* ========================================= */
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .badge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px; /* 加大 padding 避免發光效果被切掉 */
+        }
+
+        .badge {
+            aspect-ratio: 1;
+            background: var(--bg);
+            /* border-radius 移除，改由 shape-class 控制 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            border: 2px solid transparent;
+            transition: transform 0.2s;
+            position: relative;
+        }
+        
+        .badge.locked {
+            font-size: 14px;
+            color: #ccc;
+            background: #f5f5f5;
+        }
+
+        .badge.unlocked {
+            border-color: var(--card-border);
+            background: #fff;
+        }
+
+        .badge:hover {
+            transform: scale(1.1);
+            border-color: var(--accent);
+            z-index: 2;
+        }
+
+        .badge-grid.big {
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        }
+        .badge-grid.big .badge {
+            font-size: 45px;
+        }
+
+        .badge-carousel {
+            display: flex;
+            overflow-x: auto;
+            gap: 16px;
+            padding: 10px 5px;
+        }
+
+        .badge-carousel .badge {
+            min-width: 90px;
+            height: 90px;
+            background: var(--bg);
+            font-size: 45px;
+            flex-shrink: 0;
+            border: 2px solid var(--card-border);
+        }
+
+        .hidden { display: none !important; }
+
+        /* ========================================= */
+        /* 🌈 旅程成長條 */
+        /* ========================================= */
+
+        .journey-text {
+            text-align: center;
+            font-weight: bold;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .progress-wrapper {
+            width: 100%;
+            height: 16px;
+            background: var(--bg);
+            border-radius: 20px;
+            margin-top: 10px;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--btn-bg);
+            border-radius: 20px;
+            transition: width 1s ease;
+        }
+
+        /* ========================================= */
+        /* ⭐ 背景星星 */
+        /* ========================================= */
+
+        #starBackground {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: twinkle 3s infinite ease-in-out alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.2; transform: scale(0.8); }
+            100% { opacity: 0.9; transform: scale(1.2); }
+        }
+
+        /* ========================================= */
+        /* 🎀 MODALS */
+        /* ========================================= */
+
+        .modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 0.3s;
+        }
+        
+        .modal.hidden {
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 35px;
+            border: 4px solid var(--card-border);
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .theme-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .theme-btn {
+            background: var(--bg);
+            border: 2px solid var(--card-border);
+            padding: 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: var(--text-dark);
+            cursor: pointer;
+        }
+        .theme-btn:hover, .theme-btn.active {
+            border-color: var(--accent);
+            background: #fff;
+            transform: scale(1.05);
+        }
+
+        .label {
+            text-align: left;
+            display: block;
+            margin: 15px 0 5px;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* ========================================= */
+        /* 📷 分享畫面 (動態樣式) */
+        /* ========================================= */
+
+        .share-content {
+            width: 90%; 
+            max-width: 420px;
+            text-align: center;
+        }
+        
+        /* 基礎卡片設定 */
+        .share-card {
+            padding: 25px;
+            border-radius: 30px;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            text-align: center;
+            
+            /* 動態變數 */
+            background: var(--share-bg);
+            border: var(--share-border);
+        }
+
+        .share-card .share-badge-large {
+            width: 120px;
+            height: 120px;
+            margin: 10px auto;
+            background: var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            animation: twinkle 3s infinite;
+        }
+        
+        /* 樣式 1: 圓點風 */
+        .share-card.style-0 {
+            background-color: #fff;
+            background-image: radial-gradient(var(--card-border) 2px, transparent 2px);
+            background-size: 20px 20px;
+            border: 4px dashed var(--accent);
+        }
+        
+        /* 樣式 2: 漸層風 */
+        .share-card.style-1 {
+            background: linear-gradient(135deg, var(--bg) 0%, #fff 100%);
+            border: 4px double var(--accent);
+        }
+        
+        /* 樣式 3: 簡約色塊 */
+        .share-card.style-2 {
+            background: var(--bg);
+            border: 8px solid #fff;
+            outline: 2px solid var(--card-border);
+        }
+        
+        /* 樣式 4: 斜紋風 */
+        .share-card.style-3 {
+            background: repeating-linear-gradient(
+              45deg,
+              #fff,
+              #fff 10px,
+              var(--bg) 10px,
+              var(--bg) 20px
+            );
+            border: 4px solid var(--text-main);
+        }
+
+        /* 樣式 5: 邊框風 */
+        .share-card.style-4 {
+            background: #fff;
+            border: 2px solid var(--card-border);
+            box-shadow: inset 0 0 0 6px var(--bg);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.8);
+            padding: 10px;
+            border-radius: 15px;
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(2px);
+        }
+
+        .stat-num {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .share-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .share-actions .modal-btn {
+            font-size: 14px;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 🌸 活動主標 -->
+    <header class="header">
+        <h1 class="main-title">🌸 小葵的三麗鷗夢想舞台 🌸</h1>
+        <div class="deadline-tag">投票截止：12/22 23:59</div>
+        <div id="greeting" class="greeting"></div>
+    </header>
+
+    <!-- ====================================== -->
+    <!-- ☁️ 主內容區 -->
+    <!-- ====================================== -->
+
+    <main class="main-container">
+
+        <!-- 今日小語（泡泡卡片） -->
+        <section class="card bubble-card">
+            <h2 class="section-title">💬 今日小葵說</h2>
+            <p id="dailyQuote" class="daily-quote"></p>
+        </section>
+
+        <!-- 投票區塊（泡泡卡片） -->
+        <section class="card bubble-card">
+            <h2 class="section-title">🗳️ 應援小葵</h2>
+            <a id="voteLinkBtn" target="_blank" 
+               href="https://sanriokids.sanrio.com.tw/videos/103?tid=630455c396ac04f98589ba1170f22c84"
+               class="vote-link">前往投票頁面 🗳️</a>
+
+            <button id="voteBtn" class="vote-button">我今天有投票！(抽徽章)</button>
+            
+            <!-- 新增常駐提示 -->
+            <p style="font-size: 0.85rem; color: #ff6b81; text-align: center; margin-top: 10px; font-weight: bold; line-height: 1.4;">
+                🎁 小驚喜：若抽中「向日葵 🌻」<br>
+                記得分享貼文並截圖回傳給我 / tag我，可兌換 45元飲料一杯！
+            </p>
+
+            <div id="voteMsg" class="vote-msg"></div>
+
+            <h3 class="section-title" style="margin-top:20px;">🎀 今天的徽章</h3>
+            <div class="today-badge-container">
+                <div id="todayBadge" class="today-badge">❓</div>
+            </div>
+        </section>
+
+        <!-- 徽章冊（泡泡卡片） -->
+        <section class="card bubble-card">
+            <div class="flex-between">
+                <h2 class="section-title">🌈 我的徽章冊</h2>
+
+                <select id="badgeStyleSelector" class="selector" style="width: auto; padding: 5px 10px;">
+                    <option value="grid">小卡</option>
+                    <option value="big">大卡</option>
+                    <option value="carousel">輪播</option>
+                </select>
+            </div>
+
+            <div id="badgeGrid" class="badge-grid"></div>
+            <div id="badgeCarousel" class="badge-carousel hidden"></div>
+        </section>
+
+        <!-- 旅程紀錄（泡泡卡片） -->
+        <section class="card bubble-card">
+            <h2 class="section-title">📅 旅程紀錄</h2>
+            <p id="journeyText" class="journey-text"></p>
+
+            <div class="progress-wrapper">
+                <div id="journeyBar" class="progress-bar"></div>
+            </div>
+            <p id="targetText" style="text-align:center; font-size:0.8rem; margin-top:8px; color:#999;"></p>
+        </section>
+
+        <!-- 分享模式（泡泡卡片） -->
+        <section class="card bubble-card">
+            <h2 class="section-title">📷 分享應援卡</h2>
+            <button id="shareBtn" class="share-button">輸入祝福並生成卡片</button>
+        </section>
+
+    </main>
+
+    <!-- ====================================== -->
+    <!-- ⭐ Footer（設定按鈕） -->
+    <!-- ====================================== -->
+
+    <footer class="footer">
+        <button id="openSettings" class="settings-btn">⚙️</button>
+    </footer>
+
+    <!-- ====================================== -->
+    <!-- 🎀 MODALS -->
+    <!-- ====================================== -->
+
+    <!-- 主題選擇 (初始進入) -->
+    <div id="themeModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>選擇你的主題色 🌈</h2>
+            <p style="color:var(--text-dark); opacity:0.7; margin-bottom:20px;">選一個想陪小葵跳舞的主題吧！</p>
+            <div class="theme-grid" id="initThemeGrid">
+                <!-- JS 動態生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 暱稱設定 -->
+    <div id="nameModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>你想用什麼暱稱陪小葵跳舞呢？</h2>
+            <input id="nicknameInput" class="input" placeholder="輸入暱稱…" style="margin-top:20px;" />
+            <button id="saveNickname" class="modal-btn" style="width:100%; margin-top:10px;">確認</button>
+        </div>
+    </div>
+    
+    <!-- 防詐騙提醒 -->
+    <div id="voteWarningModal" class="modal hidden">
+        <div class="modal-content">
+            <h3 style="color:var(--accent); margin-bottom:15px;">⚠️ 溫馨提醒</h3>
+            <p style="text-align:left; line-height:1.6; color:var(--text-dark); font-size: 0.95rem;">
+                為了確保投票公正，點擊前往投票時，網頁會要求<strong>登入 LINE 帳號</strong>進行驗證。<br><br>
+                請放心，這絕對<strong>不是詐騙</strong>，是三麗鷗官方的正規投票機制喔！🔒
+            </p>
+            <div style="margin-top:20px; display:flex; gap:10px;">
+                <button id="confirmVoteBtn" class="modal-btn" style="width:100%;">我知道了，前往投票 ➡️</button>
+            </div>
+            <button id="cancelVoteBtn" class="small-btn" style="margin-top:10px; border:none; color:#999; width:100%;">取消</button>
+        </div>
+    </div>
+
+    <!-- 設定頁 -->
+    <div id="settingsModal" class="modal hidden">
+        <div class="modal-content settings-box">
+            <h2>⚙️ 設定</h2>
+
+            <label class="label">暱稱</label>
+            <input id="nicknameEdit" class="input" />
+
+            <label class="label">切換主題</label>
+            <!-- 這裡直接嵌入按鈕格，方便切換 -->
+            <div class="theme-grid" id="settingsThemeGrid" style="margin-top:10px; margin-bottom:20px;">
+                 <!-- JS 動態生成 -->
+            </div>
+
+            <label class="label">徽章展示模式</label>
+            <select id="styleSelector" class="input">
+                <option value="grid">小卡</option>
+                <option value="big">大卡</option>
+                <option value="carousel">輪播</option>
+            </select>
+            
+            <label class="label">徽章造型</label>
+            <select id="shapeSelector" class="input">
+                <option value="default">預設 (圓角)</option>
+                <option value="circle">圓形泡泡</option>
+                <option value="stamp">郵票風格</option>
+                <option value="glow">發光特效</option>
+            </select>
+
+            <button id="resetData" class="delete-btn">⚠️ 清除全部資料</button>
+            <button id="closeSettings" class="modal-btn" style="width:100%; margin-top:10px;">儲存並關閉</button>
+        </div>
+    </div>
+
+    <!-- 分享畫面 (含祝福語輸入) -->
+    <div id="shareModal" class="modal hidden">
+        <div class="share-content">
+            <div class="modal-content" style="width:100%; max-width:100%; padding:20px;">
+                <h3 style="color:var(--accent); margin-bottom:10px;">寫下你的祝福 💌</h3>
+                <textarea id="shareWishInput" class="textarea" rows="2" placeholder="在這裡輸入想對小葵說的話... (留空則不顯示)"></textarea>
+                
+                <h3 style="color:var(--text-dark); margin:15px 0 10px; font-size:16px;">預覽你的應援卡</h3>
+                <p style="font-size:12px; color:#999; margin-bottom:5px;">(卡片樣式會隨打卡天數變化喔！)</p>
+                
+                <!-- 真正截圖的區塊 -->
+                <div id="shareCard" class="share-card">
+                    <!-- 內容由 JS 動態生成 -->
+                </div>
+                
+                <div class="share-actions">
+                     <button id="downloadCardBtn" class="modal-btn" style="background:var(--accent);">下載圖片 (發IG) ⬇️</button>
+                     <button id="shareNativeBtn" class="modal-btn" style="background:var(--btn-bg);">分享連結 🔗</button>
+                </div>
+                
+                <button id="closeShare" class="modal-btn" style="width:100%; margin-top:10px; background:#ccc; color:#666;">關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 背景星星 -->
+    <div id="starBackground"></div>
+
+    <script>
+        /* ===========================================
+           🌸 LocalStorage 資料模型初始化
+        =========================================== */
+
+        const STORAGE_KEY = "dreamStageDataV2"; 
+        const DEADLINE = new Date("2025-12-22T23:59:59");
+        const PAGE_URL = window.location.href; 
+        
+        // 普通徽章池 (移除向日葵，確保它是稀有的)
+        const BADGE_POOL = [
+            "🎀", "🌸", "🍬", "🍭", "🍮", "☁️", "🍎", "🍓", "🧁", "🧸", 
+            "🦄", "🐰", "🐱", "🐶", "⭐", "🌙", "🎵", "🎤", "👑", "💎",
+            "🎨", "🚀", "🎡", "🏰", "🧶", "🕶️", "🎒", "☂️", "🩰", "🎟️"
+        ];
+
+        const THEMES = [
+            { id: "melody", name: "🎀 Melody" },
+            { id: "cinnamoroll", name: "☁️ Cinnamoroll" },
+            { id: "kuromi", name: "💜 Kuromi" },
+            { id: "pompompurin", name: "⭐ 布丁狗" },
+            { id: "kitty", name: "🎀 Kitty" }
+        ];
+
+        function loadData() {
+            try {
+                const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+                
+                const defaultData = {
+                    nickname: "",
+                    theme: "",
+                    badges: [], 
+                    lastVote: "",
+                    startDate: new Date().toISOString(),
+                    myWish: "", 
+                    badgeStyle: "grid",
+                    badgeShape: "default", 
+                    starLevel: 0,
+                    hasSeenVoteWarning: false 
+                };
+
+                if (data) return { ...defaultData, ...data };
+                return defaultData;
+            } catch (e) {
+                console.error("資料讀取失敗，重置為預設值", e);
+                // 發生錯誤時回傳預設值，避免卡死
+                return {
+                    nickname: "",
+                    theme: "",
+                    badges: [], 
+                    lastVote: "",
+                    startDate: new Date().toISOString(),
+                    myWish: "", 
+                    badgeStyle: "grid",
+                    badgeShape: "default", 
+                    starLevel: 0,
+                    hasSeenVoteWarning: false 
+                };
+            }
+        }
+
+        let DATA = loadData();
+
+        /* ===========================================
+           🌸 工具函式
+        =========================================== */
+
+        function save() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA));
+            } catch (e) {
+                console.error("儲存失敗", e);
+                // 如果是在無痕模式或容量滿了，跳出提示
+                if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+                    alert("⚠️ 無法儲存進度！\n您的瀏覽器儲存空間已滿，或開啟了「私密/無痕模式」。\n請改用一般瀏覽器開啟，以免徽章消失喔！");
+                }
+            }
+        }
+
+        function $(id) {
+            return document.getElementById(id);
+        }
+
+        function getTotalSlots() {
+            const start = new Date(DATA.startDate);
+            start.setHours(0,0,0,0); 
+            const end = new Date(DEADLINE);
+            
+            let diffTime = end - start;
+            let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays < 1) diffDays = 1; 
+            return diffDays;
+        }
+
+        /* ===========================================
+           🌈 主題切換邏輯 (含 UI 生成)
+        =========================================== */
+
+        function renderThemeButtons(containerId, isSettings = false) {
+            const container = $(containerId);
+            container.innerHTML = "";
+            
+            THEMES.forEach(theme => {
+                const btn = document.createElement("button");
+                btn.className = "theme-btn";
+                btn.dataset.theme = theme.id;
+                btn.textContent = theme.name;
+                
+                // 設定頁面中，標示目前選中的主題
+                if (isSettings && DATA.theme === theme.id) {
+                    btn.classList.add("active");
+                    btn.style.border = "2px solid var(--accent)";
+                }
+
+                btn.onclick = () => {
+                    DATA.theme = theme.id;
+                    save();
+                    applyTheme();
+                    
+                    if (isSettings) {
+                        // 更新按鈕狀態
+                        renderThemeButtons("settingsThemeGrid", true);
+                    } else {
+                        $("themeModal").classList.add("hidden");
+                        askNicknameIfNeeded();
+                    }
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function applyTheme() {
+            document.body.className = "";
+            if (DATA.theme) {
+                document.body.setAttribute('data-theme', DATA.theme);
+            }
+        }
+
+        /* ===========================================
+           ☁️ 首次進站 & 暱稱
+        =========================================== */
+
+        function askThemeIfNeeded() {
+            if (!DATA.theme) {
+                renderThemeButtons("initThemeGrid", false);
+                $("themeModal").classList.remove("hidden");
+            }
+        }
+
+        function askNicknameIfNeeded() {
+            if (!DATA.nickname) {
+                $("nameModal").classList.remove("hidden");
+            } else {
+                updateGreeting();
+            }
+        }
+
+        $("saveNickname").onclick = () => {
+            const name = $("nicknameInput").value.trim();
+            if (!name) return;
+            DATA.nickname = name;
+            save();
+            $("nameModal").classList.add("hidden");
+            updateGreeting();
+        };
+
+        function updateGreeting() {
+            $("greeting").textContent = `歡迎回來，${DATA.nickname} 🌟`;
+        }
+        
+        // --- 投票連結攔截 ---
+        const voteLink = $("voteLinkBtn");
+        
+        voteLink.addEventListener('click', (e) => {
+            if (!DATA.hasSeenVoteWarning) {
+                e.preventDefault(); // 阻止跳轉
+                $("voteWarningModal").classList.remove("hidden");
+            }
+        });
+
+        $("confirmVoteBtn").onclick = () => {
+            DATA.hasSeenVoteWarning = true;
+            save();
+            $("voteWarningModal").classList.add("hidden");
+            window.open(voteLink.href, '_blank');
+        };
+
+        $("cancelVoteBtn").onclick = () => {
+            $("voteWarningModal").classList.add("hidden");
+        };
+
+
+        /* ===========================================
+           💬 今日小語 (劇情模式)
+        =========================================== */
+
+        function getCurrentDayNumber() {
+            const start = new Date(DATA.startDate);
+            start.setHours(0,0,0,0);
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            
+            // 計算今天是第幾天 (從 1 開始)
+            let diffTime = today - start;
+            let diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            
+            if (diffDays < 1) diffDays = 1;
+            return diffDays;
+        }
+
+        const QUOTE_START = "今天是第一天…小葵有一點點小害羞～可以陪我一起跳跳嗎？🩰💗";
+        
+        const QUOTES_MIDDLE = [
+            "我把小舞步跳給雲朵看～雲朵說我跳得軟棉棉的 ☁️🩰",
+            "今天轉圈圈…我沒有倒！我變成不會暈的小勇士 ✨",
+            "跌倒了…可是我一下子就站起來！因為我想跳得更好～🌈",
+            "今天想跳給星星～星星眨眼眼跟我說：小葵最棒了 ⭐",
+            "謝謝你每天都來看我～你一來我肚子裡就變暖暖的 ❤️",
+            "風吹著我的裙裙～它說：嘿，我把你托高一點點喔✨",
+            "離很亮亮的舞台越、來、越、近！小葵心裡在跳蹦蹦跳 🎀",
+            "今天想跳得亮亮亮～像小燈泡一樣亮到會害羞 🌟",
+            "我們快完成惹！加油加油～我抓著你的手一起前進 💖"
+        ];
+
+        const QUOTE_END = "耶～跳完了！可是…小葵還想再跳一次給你看可以嗎？✨🩰💗";
+
+        function updateDailyQuote() {
+            const currentDay = getCurrentDayNumber();
+            const totalDays = getTotalSlots();
+            const quoteEl = $("dailyQuote");
+            
+            if (currentDay <= 1) {
+                // 第一天
+                quoteEl.textContent = QUOTE_START;
+            } else if (currentDay >= totalDays) {
+                // 最後一天 (或活動結束後)
+                quoteEl.textContent = QUOTE_END;
+            } else {
+                // 中間的天數：輪播中間的語錄
+                // 使用 (currentDay - 2) 確保第二天從陣列第 0 個開始
+                // 使用 % 取餘數，確保超過陣列長度時會循環，不會報錯
+                const index = (currentDay - 2) % QUOTES_MIDDLE.length;
+                quoteEl.textContent = QUOTES_MIDDLE[Math.abs(index)];
+            }
+        }
+
+        /* ===========================================
+           🎀 隨機徽章系統
+        =========================================== */
+
+        function getShapeClass() {
+            return `shape-${DATA.badgeShape || 'default'}`;
+        }
+
+        function renderTodayBadge() {
+            const today = new Date().toLocaleDateString();
+            const badgeEl = $("todayBadge");
+            
+            // 重置 class 並加上造型 class
+            badgeEl.className = "today-badge " + getShapeClass();
+
+            if (DATA.lastVote === today && DATA.badges.length > 0) {
+                const latestBadge = DATA.badges[DATA.badges.length - 1];
+                badgeEl.textContent = latestBadge.icon;
+            } else {
+                badgeEl.textContent = "❓";
+            }
+        }
+
+        function unlockBadge() {
+            const today = new Date().toLocaleDateString();
+            const now = new Date();
+
+            if (now > DEADLINE) {
+                alert("活動已經結束囉！謝謝你的參與！🌸");
+                return;
+            }
+
+            if (DATA.lastVote === today) {
+                $("voteMsg").textContent = "今天已經領過徽章囉！明天再來吧！";
+                return;
+            }
+
+            // --- 抽獎邏輯開始 ---
+            let randomIcon;
+            let isSuperRare = false;
+
+            // 設定超級大獎機率 (例如 0.02 = 2%)
+            const SUPER_RARE_CHANCE = 0.02; 
+
+            if (Math.random() < SUPER_RARE_CHANCE) {
+                // 中大獎！
+                randomIcon = "🌻"; // 向日葵
+                isSuperRare = true;
+            } else {
+                // 普通獎
+                randomIcon = BADGE_POOL[Math.floor(Math.random() * BADGE_POOL.length)];
+            }
+            // --- 抽獎邏輯結束 ---
+            
+            DATA.badges.push({
+                icon: randomIcon,
+                date: today,
+                timestamp: now.getTime()
+            });
+            DATA.lastVote = today;
+            save();
+
+            const badgeEl = $("todayBadge");
+            badgeEl.textContent = randomIcon;
+            
+            // 確保套用正確的造型與動畫
+            badgeEl.className = "today-badge " + getShapeClass();
+            void badgeEl.offsetWidth; 
+            badgeEl.classList.add("animate-pop");
+
+            renderBadges();
+            renderJourney();
+            generateStars();
+
+            // 根據是否中大獎顯示不同訊息
+            const msgEl = $("voteMsg");
+            if (isSuperRare) {
+                // 更新為指定的中獎提示語
+                msgEl.innerHTML = `🎉 <strong>恭喜抽中隱藏版向日葵！🌻</strong><br>記得分享貼文並截圖回傳給我 / tag我，可兌換 45元飲料一杯！🥤`;
+                msgEl.style.color = "#ff4757"; // 特別的紅色
+                msgEl.style.fontSize = "1rem";
+                msgEl.style.lineHeight = "1.5";
+                // 自動觸發慶祝特效 (例如多一點星星)
+                for(let i=0; i<20; i++) setTimeout(generateStars, i*100);
+            } else {
+                msgEl.textContent = `獲得了新徽章：${randomIcon} ✨`;
+                msgEl.style.color = "var(--accent)";
+                msgEl.style.fontSize = "0.95rem";
+            }
+            
+            $("voteBtn").classList.add("disabled");
+            $("voteBtn").textContent = "今天已完成！✅";
+        }
+
+        $("voteBtn").onclick = unlockBadge;
+
+        /* ===========================================
+           🌈 徽章展示模式
+        =========================================== */
+
+        function renderBadges() {
+            const grid = $("badgeGrid");
+            const carousel = $("badgeCarousel");
+            grid.classList.remove("big");
+            grid.classList.remove("hidden");
+            carousel.classList.add("hidden");
+
+            const style = DATA.badgeStyle;
+            const shapeClass = getShapeClass();
+
+            if($("badgeStyleSelector")) $("badgeStyleSelector").value = style;
+
+            const totalSlots = getTotalSlots();
+            const earnedCount = DATA.badges.length;
+
+            if (style === "grid" || style === "big") {
+                grid.innerHTML = "";
+                if (style === "big") grid.classList.add("big");
+
+                for (let i = 0; i < totalSlots; i++) {
+                    const div = document.createElement("div");
+                    
+                    if (i < earnedCount) {
+                        div.className = `badge unlocked ${shapeClass}`;
+                        div.textContent = DATA.badges[i].icon;
+                    } else {
+                        div.className = `badge locked ${shapeClass}`;
+                        div.textContent = `Day ${i + 1}`;
+                    }
+                    grid.appendChild(div);
+                }
+            }
+
+            if (style === "carousel") {
+                grid.classList.add("hidden");
+                carousel.classList.remove("hidden");
+                carousel.innerHTML = "";
+
+                if (earnedCount === 0) {
+                     carousel.innerHTML = "<span style='padding:20px; color:#999;'>快去投票收集徽章吧！</span>";
+                } else {
+                    DATA.badges.forEach(b => {
+                        const div = document.createElement("div");
+                        div.className = `badge unlocked ${shapeClass}`;
+                        div.textContent = b.icon;
+                        carousel.appendChild(div);
+                    });
+                }
+            }
+        }
+
+        $("badgeStyleSelector").onchange = (e) => {
+            DATA.badgeStyle = e.target.value;
+            save();
+            renderBadges();
+        };
+
+        /* ===========================================
+           🌈 旅程紀錄
+        =========================================== */
+
+        function renderJourney() {
+            const totalSlots = getTotalSlots();
+            const current = DATA.badges.length;
+            
+            $("journeyText").textContent =
+                `已收集 ${current} 個徽章`;
+            
+            $("targetText").textContent = 
+                `目標：解鎖 ${totalSlots} 天的徽章紀錄！`;
+
+            const percent = Math.min((current / totalSlots) * 100, 100);
+            $("journeyBar").style.width = percent + "%";
+            
+            const today = new Date().toLocaleDateString();
+            if (DATA.lastVote === today) {
+                $("voteBtn").classList.add("disabled");
+                $("voteBtn").textContent = "今天已完成！✅";
+            } else {
+                $("voteBtn").classList.remove("disabled");
+                $("voteBtn").textContent = "我今天有投票！(抽徽章)";
+            }
+        }
+
+        /* ===========================================
+           📷 分享畫面 (動態設計 + 下載)
+        =========================================== */
+
+        function getCardStyleIndex() {
+            // 使用收集徽章數來決定今天的樣式 (0-4)
+            // 這樣每天收集新徽章後，卡片背景就會變
+            return DATA.badges.length % 5;
+        }
+
+        function updateShareCardPreview() {
+            const shareCard = $("shareCard");
+            const todayBadge = DATA.badges.length > 0 ? DATA.badges[DATA.badges.length - 1].icon : "🥚";
+            const wish = $("shareWishInput").value.trim();
+            const badgeCount = DATA.badges.length;
+            
+            // 重置所有 style class
+            shareCard.className = "share-card";
+            // 加入今日限定樣式
+            const styleIndex = getCardStyleIndex();
+            shareCard.classList.add(`style-${styleIndex}`);
+            
+            let wishHtml = "";
+            if (wish) {
+                wishHtml = `
+                <div style="background:rgba(255,255,255,0.7); padding:15px; border-radius:15px; margin-bottom:15px; border:2px dashed var(--card-border);">
+                    <p style="font-size:1.1rem; color:var(--text-dark); font-weight:bold; word-wrap:break-word; margin:0;">${wish}</p>
+                </div>`;
+            }
+
+            // 根據設定的造型改變分享卡片上的大徽章
+            const shapeClass = getShapeClass();
+
+            shareCard.innerHTML = `
+                <h3 style="margin-bottom:5px; color:var(--accent); font-size:1.3rem; text-shadow:1px 1px 0 #fff;">${DATA.nickname} 的應援卡</h3>
+                
+                <div class="share-badge-large ${shapeClass}">
+                    ${todayBadge}
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-num">${badgeCount}</div>
+                        <div class="stat-label">獲得徽章</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-num">${badgeCount}</div>
+                        <div class="stat-label">打卡天數</div>
+                    </div>
+                </div>
+
+                ${wishHtml}
+
+                <div style="color:var(--text-dark); opacity:0.7; font-size:0.8rem; border-top:1px solid rgba(0,0,0,0.1); padding-top:10px; display:flex; flex-direction:column; gap:5px;">
+                    <span style="font-weight:bold;">#小葵的三麗鷗夢想舞台</span>
+                    <span>${new Date().toLocaleDateString()}</span>
+                    <span style="font-size:0.7rem;">sanriokids.sanrio.com.tw</span>
+                </div>
+            `;
+        }
+
+        // 開啟分享
+        $("shareBtn").onclick = () => {
+            $("shareModal").classList.remove("hidden");
+            $("shareWishInput").value = DATA.myWish;
+            updateShareCardPreview();
+        };
+
+        // 即時預覽
+        $("shareWishInput").addEventListener("input", (e) => {
+            DATA.myWish = e.target.value;
+            save(); 
+            updateShareCardPreview();
+        });
+
+        // 下載圖片
+        $("downloadCardBtn").onclick = () => {
+            const element = document.getElementById("shareCard");
+            const originalStyle = element.style.cssText;
+            
+            // 強制固定寬度以獲得最佳截圖效果
+            element.style.width = "360px"; 
+            element.style.margin = "0 auto";
+            element.style.transform = "none";
+
+            html2canvas(element, {
+                backgroundColor: null, // 保留 CSS 中的背景設定
+                scale: 2
+            }).then(canvas => {
+                element.style.cssText = originalStyle;
+                const link = document.createElement('a');
+                link.download = `小葵應援卡_Day${DATA.badges.length}.png`;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            });
+        };
+
+        // 原生分享 / 複製連結
+        $("shareNativeBtn").onclick = async () => {
+            const shareData = {
+                title: '小葵的三麗鷗夢想舞台',
+                text: `我已經連續應援 ${DATA.badges.length} 天了！快來一起幫小葵加油！🎀`,
+                url: window.location.href
+            };
+
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                } catch (err) {
+                    console.log('分享取消或失敗', err);
+                }
+            } else {
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    alert("連結已複製！可以去 IG 貼上囉！🔗");
+                });
+            }
+        };
+
+        $("closeShare").onclick = () => {
+            $("shareModal").classList.add("hidden");
+        };
+
+        /* ===========================================
+           ⭐ 背景星星
+        =========================================== */
+
+        function generateStars() {
+            const container = $("starBackground");
+            container.innerHTML = "";
+            const count = 15 + DATA.badges.length * 2; 
+
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement("div");
+                star.className = "star";
+                star.style.left = Math.random() * 100 + "%";
+                star.style.top = Math.random() * 100 + "%";
+                star.style.animationDelay = (Math.random() * 2) + "s";
+                container.appendChild(star);
+            }
+        }
+
+        /* ===========================================
+           ⚙️ 設定頁
+        =========================================== */
+
+        $("openSettings").onclick = () => {
+            $("settingsModal").classList.remove("hidden");
+            $("nicknameEdit").value = DATA.nickname;
+            
+            // 在設定頁中生成主題按鈕
+            renderThemeButtons("settingsThemeGrid", true);
+            
+            if($("styleSelector")) $("styleSelector").value = DATA.badgeStyle;
+            if($("shapeSelector")) $("shapeSelector").value = DATA.badgeShape;
+        };
+
+        $("closeSettings").onclick = () => {
+            $("settingsModal").classList.add("hidden");
+        };
+
+        if($("styleSelector")) {
+             $("styleSelector").onchange = (e) => {
+                DATA.badgeStyle = e.target.value;
+                save();
+                renderBadges();
+            };
+        }
+        
+        // 監聽造型切換
+        if($("shapeSelector")) {
+            $("shapeSelector").onchange = (e) => {
+                DATA.badgeShape = e.target.value;
+                save();
+                renderBadges();
+                renderTodayBadge(); // 即時更新今日徽章
+            };
+        }
+
+        $("resetData").onclick = () => {
+            if (confirm("確定要清除所有資料嗎？(徽章會全部消失喔)")) {
+                localStorage.removeItem(STORAGE_KEY);
+                location.reload();
+            }
+        };
+
+        $("nicknameEdit").onchange = (e) => {
+            DATA.nickname = e.target.value;
+            save();
+            updateGreeting();
+        };
+
+        /* ===========================================
+           🚀 初始化
+        =========================================== */
+        
+        // 確保 DOM 完全載入後再執行
+        function initApp() {
+            const now = new Date();
+            if (now > DEADLINE) {
+                 if ($("voteMsg")) $("voteMsg").textContent = "活動已於 12/22 結束，感謝您的參與！";
+                 if ($("voteBtn")) {
+                     $("voteBtn").classList.add("disabled");
+                     $("voteBtn").textContent = "活動結束";
+                     $("voteBtn").onclick = null;
+                 }
+            }
+
+            applyTheme();
+            
+            // 優化流程：確保視窗不會同時跳出來
+            if (!DATA.theme) {
+                // 情況 1：完全新使用者 -> 先選主題
+                renderThemeButtons("initThemeGrid", false);
+                $("themeModal").classList.remove("hidden");
+                // 注意：選完主題的按鈕事件裡，會自動呼叫 askNicknameIfNeeded()
+            } else {
+                // 情況 2：已有主題（可能是選完主題後重新整理，或老使用者）
+                // 檢查是否需要輸入暱稱
+                askNicknameIfNeeded();
+            }
+
+            updateDailyQuote();
+            renderTodayBadge();
+            renderBadges();
+            renderJourney();
+            generateStars();
+        }
+        
+        // 當 DOM 載入完成後執行初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initApp);
+        } else {
+            initApp();
+        }
+    </script>
+</body>
+</html>
