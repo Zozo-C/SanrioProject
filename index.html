@@ -827,8 +827,7 @@
                 <option value="glow">發光特效</option>
             </select>
 
-            <button id="resetData" class="delete-btn">⚠️ 清除全部資料</button>
-            <button id="closeSettings" class="modal-btn" style="width:100%; margin-top:10px;">儲存並關閉</button>
+            <button id="closeSettings" class="modal-btn" style="width:100%; margin-top:20px;">儲存並關閉</button>
         </div>
     </div>
 
@@ -1558,13 +1557,6 @@
                 renderTodayBadge(); // 即時更新今日徽章
             };
         }
-
-        $("resetData").onclick = () => {
-            if (confirm("確定要清除所有資料嗎？(徽章會全部消失喔)")) {
-                localStorage.removeItem(STORAGE_KEY);
-                location.reload();
-            }
-        };
 
         $("nicknameEdit").onchange = (e) => {
             DATA.nickname = e.target.value;
