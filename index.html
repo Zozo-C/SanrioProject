@@ -848,9 +848,14 @@
                 </div>
                 
                 <div class="share-actions">
-                     <button id="downloadCardBtn" class="modal-btn" style="background:var(--accent);">下載圖片 (發IG) ⬇️</button>
-                     <button id="shareNativeBtn" class="modal-btn" style="background:var(--btn-bg);">分享連結 🔗</button>
+                     <button id="downloadCardBtn" class="modal-btn" style="background:var(--accent);">📥 儲存圖片</button>
+                     <button id="shareNativeBtn" class="modal-btn" style="background:var(--btn-bg);">📤 分享</button>
                 </div>
+                
+                <p style="font-size:11px; color:#999; margin-top:8px; line-height:1.4;">
+                    💡 手機版：「儲存圖片」後長按可存到相簿<br>
+                    「分享」可直接分享圖片到 IG/LINE 等社群
+                </p>
                 
                 <button id="closeShare" class="modal-btn" style="width:100%; margin-top:10px; background:#ccc; color:#666;">關閉</button>
             </div>
@@ -1366,7 +1371,7 @@
             updateShareCardPreview();
         });
 
-        // 下載圖片
+        // 下載圖片 (手機版會引導長按儲存)
         $("downloadCardBtn").onclick = () => {
             const element = document.getElementById("shareCard");
             const originalStyle = element.style.cssText;
@@ -1381,33 +1386,118 @@
                 scale: 2
             }).then(canvas => {
                 element.style.cssText = originalStyle;
-                const link = document.createElement('a');
-                link.download = `小葵應援卡_Day${DATA.badges.length}.png`;
-                link.href = canvas.toDataURL("image/png");
-                link.click();
+                
+                // 偵測是否為手機裝置
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                
+                if (isMobile) {
+                    // 手機版：顯示圖片並引導長按儲存
+                    const imgWindow = window.open('');
+                    imgWindow.document.write(`
+                        <html>
+                        <head>
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <style>
+                                body { 
+                                    margin: 0; 
+                                    padding: 20px; 
+                                    background: #f5f5f5; 
+                                    font-family: system-ui, -apple-system, sans-serif;
+                                    text-align: center;
+                                }
+                                .tip { 
+                                    background: #fff; 
+                                    padding: 15px; 
+                                    border-radius: 10px; 
+                                    margin-bottom: 15px;
+                                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                                }
+                                img { 
+                                    max-width: 100%; 
+                                    border-radius: 15px; 
+                                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                                }
+                                .instruction {
+                                    color: #ff66a3;
+                                    font-weight: bold;
+                                    font-size: 16px;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="tip">
+                                <p class="instruction">📱 長按下方圖片</p>
+                                <p style="color: #666; font-size: 14px;">選擇「儲存圖片」或「加入相片」<br>即可儲存到相簿！</p>
+                            </div>
+                            <img src="${canvas.toDataURL('image/png')}" alt="小葵應援卡">
+                        </body>
+                        </html>
+                    `);
+                } else {
+                    // 電腦版：直接下載
+                    const link = document.createElement('a');
+                    link.download = `小葵應援卡_Day${DATA.badges.length}.png`;
+                    link.href = canvas.toDataURL("image/png");
+                    link.click();
+                }
             });
         };
 
-        // 原生分享 / 複製連結
+        // 分享圖片到社群媒體
         $("shareNativeBtn").onclick = async () => {
-            const shareData = {
-                title: '小葵的三麗鷗夢想舞台',
-                text: `我已經連續應援 ${DATA.badges.length} 天了！快來一起幫小葵加油！🎀`,
-                url: window.location.href
-            };
+            const element = document.getElementById("shareCard");
+            const originalStyle = element.style.cssText;
+            
+            element.style.width = "360px"; 
+            element.style.margin = "0 auto";
+            element.style.transform = "none";
 
-            if (navigator.share) {
-                try {
-                    await navigator.share(shareData);
-                } catch (err) {
-                    console.log('分享取消或失敗', err);
-                }
-            } else {
-                navigator.clipboard.writeText(window.location.href).then(() => {
-                    alert("連結已複製！可以去 IG 貼上囉！🔗");
-                });
-            }
+            html2canvas(element, {
+                backgroundColor: null,
+                scale: 2
+            }).then(async (canvas) => {
+                element.style.cssText = originalStyle;
+                
+                // 將 canvas 轉換為 blob
+                canvas.toBlob(async (blob) => {
+                    const file = new File([blob], `小葵應援卡_Day${DATA.badges.length}.png`, { type: 'image/png' });
+                    
+                    const shareData = {
+                        title: '小葵的三麗鷗夢想舞台',
+                        text: `我已經連續應援 ${DATA.badges.length} 天了！快來一起幫小葵加油！🎀\n\n#小葵的三麗鷗夢想舞台`,
+                        files: [file]
+                    };
+
+                    // 檢查瀏覽器是否支援分享圖片
+                    if (navigator.canShare && navigator.canShare(shareData)) {
+                        try {
+                            await navigator.share(shareData);
+                        } catch (err) {
+                            if (err.name !== 'AbortError') {
+                                console.log('分享失敗，降級為複製連結', err);
+                                fallbackShare();
+                            }
+                        }
+                    } else {
+                        // 不支援分享圖片，降級為複製連結
+                        fallbackShare();
+                    }
+                }, 'image/png');
+            });
         };
+        
+        // 降級方案：複製連結
+        function fallbackShare() {
+            const shareText = `我已經連續應援 ${DATA.badges.length} 天了！快來一起幫小葵加油！🎀\n\n${window.location.href}\n\n#小葵的三麗鷗夢想舞台`;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(shareText).then(() => {
+                    alert("✅ 文字已複製！\n\n請：\n1. 先點「下載圖片 (發IG)」儲存圖片\n2. 打開 IG 上傳圖片\n3. 貼上剛才複製的文字\n\n這樣就能同時分享圖片和連結囉！");
+                });
+            } else {
+                alert("請手動複製連結：\n" + window.location.href);
+            }
+        }
 
         $("closeShare").onclick = () => {
             $("shareModal").classList.add("hidden");
